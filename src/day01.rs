@@ -1,13 +1,20 @@
 use aoc_runner_derive::aoc;
-use std::cmp::min;
 
 const RADIX: u32 = 10;
 
-fn find_digit<I>(mut chars: I) -> Option<u32>
+fn digits_to_value(tens: u32, ones: u32) -> u32 {
+    (tens * RADIX) + ones
+}
+
+fn find_digit<I>(mut chars: I) -> u32
 where
     I: Iterator<Item = char>,
 {
-    chars.find(|c| c.is_digit(RADIX))?.to_digit(RADIX)
+    chars
+        .find(|c| c.is_digit(RADIX))
+        .unwrap()
+        .to_digit(RADIX)
+        .unwrap()
 }
 
 #[aoc(day1, part1)]
@@ -15,26 +22,17 @@ fn part1(input: &str) -> u32 {
     let mut sum = 0;
 
     for line in input.lines() {
-        let left_digit = find_digit(line.chars()).unwrap();
-        let right_digit = find_digit(line.chars().rev()).unwrap();
+        let left_digit = find_digit(line.chars());
+        let right_digit = find_digit(line.chars().rev());
 
-        sum += (left_digit * RADIX) + right_digit;
+        sum += digits_to_value(left_digit, right_digit)
     }
 
     sum
 }
 
-const NUMS: [(u32, &str); RADIX as usize] = [
-    (0, "zero"),
-    (1, "one"),
-    (2, "two"),
-    (3, "three"),
-    (4, "four"),
-    (5, "five"),
-    (6, "six"),
-    (7, "seven"),
-    (8, "eight"),
-    (9, "nine"),
+const NUMS: [&str; RADIX as usize] = [
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 ];
 
 fn find_digit_str(subline: &str) -> Option<u32> {
@@ -46,9 +44,9 @@ fn find_digit_str(subline: &str) -> Option<u32> {
     }
 
     // -- Check for string.
-    for (num, word) in NUMS {
+    for (num, word) in NUMS.iter().enumerate() {
         if subline.starts_with(word) {
-            return Some(num);
+            return Some(num as u32);
         }
     }
 
@@ -59,49 +57,30 @@ fn find_value(line: &str) -> u32 {
     // -- Find left digit.
     let mut left_digit = None;
 
-    'left: for left_index in 0..line.len() {
-        let right_limit = min(left_index + LONGEST_NUM_WORD_LEN, line.len());
+    for index in 0..line.len() {
+        let digit = find_digit_str(&line[index..]);
 
-        for right_index in left_index..right_limit {
-            let curr_word = &line[left_index..=right_index];
-
-            if let Some(num) = find_digit_str(curr_word) {
-                left_digit = Some(num);
-                break 'left;
-            }
+        if digit.is_some() {
+            left_digit = digit;
+            break;
         }
     }
-
-    let left_digit = left_digit.unwrap();
 
     // -- Find right digit.
     let mut right_digit = None;
 
-    'right: for right_index in (0..line.len()).rev() {
-        const LONGEST_NUM_WORD_LEN_INDEX: usize = LONGEST_NUM_WORD_LEN - 1;
-        let left_begin = if right_index >= LONGEST_NUM_WORD_LEN_INDEX {
-            right_index - LONGEST_NUM_WORD_LEN_INDEX
-        } else {
-            0
-        };
+    for index in (0..line.len()).rev() {
+        let digit = find_digit_str(&line[index..]);
 
-        for left_index in (left_begin..=right_index).rev() {
-            let curr_word = &line[left_index..=right_index];
-
-            if let Some(num) = find_digit_str(curr_word) {
-                right_digit = Some(num);
-                break 'right;
-            }
+        if digit.is_some() {
+            right_digit = digit;
+            break;
         }
     }
 
-    let right_digit = right_digit.unwrap();
-
     // -- Calcuate value and return.
-    (left_digit * RADIX) + right_digit
+    digits_to_value(left_digit.unwrap(), right_digit.unwrap())
 }
-
-const LONGEST_NUM_WORD_LEN: usize = 5;
 
 #[aoc(day1, part2)]
 fn part2(input: &str) -> u32 {
