@@ -24,7 +24,6 @@ fn part1(input: &str) -> u32 {
     for line in input.lines() {
         let left_digit = find_digit(line.chars());
         let right_digit = find_digit(line.chars().rev());
-
         sum += digits_to_value(left_digit, right_digit)
     }
 
@@ -53,33 +52,19 @@ fn find_digit_str(subline: &str) -> Option<u32> {
     None
 }
 
-fn find_value(line: &str) -> u32 {
-    // -- Find left digit.
-    let mut left_digit = None;
-
-    for index in 0..line.len() {
+fn search_digit<I>(line: &str, indices: I) -> u32
+where
+    I: Iterator<Item = usize>,
+{
+    for index in indices {
         let digit = find_digit_str(&line[index..]);
 
-        if digit.is_some() {
-            left_digit = digit;
-            break;
+        if let Some(digit) = digit {
+            return digit;
         }
     }
 
-    // -- Find right digit.
-    let mut right_digit = None;
-
-    for index in (0..line.len()).rev() {
-        let digit = find_digit_str(&line[index..]);
-
-        if digit.is_some() {
-            right_digit = digit;
-            break;
-        }
-    }
-
-    // -- Calcuate value and return.
-    digits_to_value(left_digit.unwrap(), right_digit.unwrap())
+    panic!("unable to find digit");
 }
 
 #[aoc(day1, part2)]
@@ -87,7 +72,9 @@ fn part2(input: &str) -> u32 {
     let mut sum = 0;
 
     for line in input.lines() {
-        sum += find_value(line);
+        let left_digit = search_digit(line, 0..line.len());
+        let right_digit = search_digit(line, (0..line.len()).rev());
+        sum += digits_to_value(left_digit, right_digit)
     }
 
     sum
