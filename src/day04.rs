@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use aoc_runner_derive::{aoc, aoc_generator};
 
 #[derive(Debug)]
@@ -33,8 +35,7 @@ impl GameCard {
 
     fn new(line: &str) -> Self {
         let (card_str, nums_str) = line.split_at(line.find(": ").unwrap());
-        let (_, index_str) = card_str.split_at(card_str.find(' ').unwrap());
-        let index = index_str.trim_start().parse().unwrap();
+        let index = card_str.split_whitespace().nth(1).unwrap().parse().unwrap();
         let (winning_str, your_str) = nums_str.split_at(nums_str.find(" | ").unwrap());
 
         let winning_nums: Vec<u8> = winning_str
@@ -73,27 +74,17 @@ fn part1(cards: &[GameCard]) -> u32 {
 #[aoc(day4, part2)]
 fn part2(cards: &[GameCard]) -> u32 {
     let mut total = 0;
-    let mut curr_cards: Box<Vec<usize>> = Box::new(cards.iter().map(|c| c.index).collect());
-    let mut new_cards = Box::<Vec<usize>>::default();
+    let mut curr_cards: VecDeque<usize> = cards.iter().map(|c| c.index).collect();
 
-    loop {
-        for curr_index in curr_cards.iter() {
-            total += 1;
+    while !curr_cards.is_empty() {
+        total += 1;
 
-            let num_matched = cards.get(*curr_index - 1).unwrap().num_matched;
+        let curr_index = curr_cards.pop_front().unwrap();
+        let num_matched = cards.get(curr_index - 1_usize).unwrap().num_matched;
 
-            for new_index in curr_index + 1..=curr_index + num_matched {
-                new_cards.push(new_index);
-            }
+        for new_index in curr_index + 1..=curr_index + num_matched {
+            curr_cards.push_back(new_index);
         }
-
-        // -- End if no new cards found;
-        if new_cards.is_empty() {
-            break;
-        }
-
-        curr_cards = new_cards;
-        new_cards = Box::<Vec<usize>>::default();
     }
 
     total
