@@ -1,10 +1,11 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::Hash;
 use std::hash::Hasher;
 use std::{cmp::min, collections::HashMap};
 
 #[repr(u8)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Hash)]
 enum SpringState {
     Operational,
     Damaged,
@@ -70,12 +71,8 @@ type ArrangementCache<'a> = HashMap<u64, usize>;
 
 fn get_hash(springs: &[SpringState], checksum: &[u8]) -> u64 {
     let mut hasher = DefaultHasher::new();
-
-    hasher.write_usize(springs.len());
-    springs.iter().for_each(|s| hasher.write_u8(*s as u8));
-    hasher.write_usize(checksum.len());
-    checksum.iter().for_each(|b| hasher.write_u8(*b));
-
+    springs.hash(&mut hasher);
+    checksum.hash(&mut hasher);
     hasher.finish()
 }
 
