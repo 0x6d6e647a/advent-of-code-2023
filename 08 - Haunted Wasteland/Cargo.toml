@@ -1,0 +1,14 @@
+[package]
+name = "haunted-wasteland"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "day08_part1"
+path = "src/part1.rs"
+
+[[bin]]
+name = "day08_part2"
+path = "src/part2.rs"
+
+[dependencies]
