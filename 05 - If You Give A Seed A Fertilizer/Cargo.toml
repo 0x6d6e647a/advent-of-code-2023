@@ -1,0 +1,14 @@
+[package]
+name = "if-you-give-a-seed-a-fertilizer"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "day05_part1"
+path = "src/part1.rs"
+
+[[bin]]
+name = "day05_part2"
+path = "src/part2.rs"
+
+[dependencies]
