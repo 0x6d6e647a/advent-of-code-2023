@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::{stdin, BufRead, Stdin};
 
-// --[ Direction ]--------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #[derive(PartialEq, Eq, Hash)]
 enum Direction {
     North,
@@ -14,7 +14,7 @@ use Direction::*;
 
 const DIRECTONS: [Direction; 4] = [North, South, East, West];
 
-// --[ Coordinate ]-------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #[derive(Clone, PartialEq, Eq, Hash)]
 struct Coordinate {
     col: usize,
@@ -45,7 +45,7 @@ impl Coordinate {
     }
 }
 
-// --[ Tile Type ]--------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #[derive(PartialEq)]
 enum TileType {
     Vertical,
@@ -90,7 +90,7 @@ impl TileType {
     }
 }
 
-// --[ Board ]------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 struct Board {
     grid: Vec<Vec<TileType>>,
     start: Coordinate,
